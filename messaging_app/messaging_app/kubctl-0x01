@@ -1,0 +1,35 @@
+#!/bin/bash
+
+# Script: kubctl-0x01
+# Objectif : Scalabilité, test de charge et surveillance de l'app Django sur Kubernetes
+
+echo "=== [1/4] Mise à l’échelle de l’application Django à 3 pods ==="
+kubectl scale deployment django-messaging-app --replicas=3
+
+echo "Attente du déploiement..."
+kubectl rollout status deployment django-messaging-app
+
+echo "=== [2/4] Vérification des pods ==="
+kubectl get pods -l app=messaging
+
+echo "=== [3/4] Test de charge avec wrk (10 secondes, 10 connexions, 2 threads) ==="
+# Utilise l'IP du cluster minikube et le port exposé
+CLUSTER_IP=$(minikube ip)
+NODE_PORT=$(kubectl get svc messaging-service --output=jsonpath='{.spec.ports[0].nodePort}')
+
+# Si le service est en ClusterIP uniquement, il ne sera pas exposé. Ajoutons un port-forward temporaire :
+kubectl port-forward service/messaging-service 8000:8000 &
+PORT_FORWARD_PID=$!
+sleep 3  # Attendre que le port-forward soit prêt
+
+wrk -t2 -c10 -d10s http://localhost:8000/
+
+kill $PORT_FORWARD_PID
+
+echo "=== [4/4] Surveillance de l’usage des ressources ==="
+# S'assurer que metrics-server est installé
+if ! kubectl top pods &> /dev/null; then
+  echo "⚠️  metrics-server n'est pas installé ou activé. Installez-le pour voir l'utilisation des ressources."
+else
+  kubectl top pods
+fi

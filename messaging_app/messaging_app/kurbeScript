@@ -1,0 +1,37 @@
+#!/bin/bash
+
+# kurbeScript - Set up and verify a local Kubernetes cluster
+
+echo "=== [1/4] Vérification de l'installation de Minikube ==="
+if ! command -v minikube &> /dev/null
+then
+    echo "Erreur : Minikube n'est pas installé. Veuillez l'installer depuis https://minikube.sigs.k8s.io/docs/start/"
+    exit 1
+fi
+
+echo "Minikube est installé."
+
+echo "=== [2/4] Démarrage du cluster Minikube ==="
+minikube start
+if [ $? -ne 0 ]; then
+    echo "Erreur : Échec du démarrage du cluster Minikube."
+    exit 1
+fi
+
+echo "=== [3/4] Vérification du cluster avec kubectl ==="
+if ! command -v kubectl &> /dev/null
+then
+    echo "kubectl n'est pas trouvé. Tentative de configuration via minikube..."
+    minikube kubectl -- get pods
+else
+    kubectl cluster-info
+    if [ $? -ne 0 ]; then
+        echo "Erreur : Le cluster n'est pas accessible avec kubectl."
+        exit 1
+    fi
+fi
+
+echo "=== [4/4] Liste des pods disponibles ==="
+kubectl get pods --all-namespaces
+
+echo "✅ Cluster Kubernetes local prêt à l'emploi."
