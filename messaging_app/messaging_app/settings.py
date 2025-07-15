@@ -20,7 +20,7 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 # See https://docs.djangoproject.com/en/4.2/howto/deployment/checklist/
 
 # SECURITY WARNING: keep the secret key used in production secret!
-SECRET_KEY = 'django-insecure-m622*ga@102z3*4fcnttda9qet%=#5==^&a53u!f_jn7rly%!m'
+SECRET_KEY = 'django-insecure-6(*okns*x^(hc+0-@@z4qa=#u5g3dv!r4)3x)ni(%ud3ep69!)'
 
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
@@ -42,6 +42,7 @@ INSTALLED_APPS = [
     'chats',
 ]
 
+# Add DRF configuration at the bottom of the file
 REST_FRAMEWORK = {
     'DEFAULT_PERMISSION_CLASSES': [
         'rest_framework.permissions.IsAuthenticated',

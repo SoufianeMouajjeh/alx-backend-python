@@ -1,5 +1,6 @@
 from rest_framework import serializers
 from django.contrib.auth import get_user_model
+from django.utils import timezone
 from .models import User, Conversation, Message, ConversationParticipant, MessageReadStatus
 
 
